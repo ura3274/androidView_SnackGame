@@ -15,6 +15,8 @@ import android.view.SurfaceView
 import android.widget.Toast
 
 import androidx.core.os.HandlerCompat
+import androidx.lifecycle.LifecycleCoroutineScope
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.withContext
@@ -59,8 +61,11 @@ class GameSurfaceView @JvmOverloads constructor (context: Context, attrs: Attrib
                             running = false
                         }
 
-                        snack.snackDraw(canvas, paint)
-                        food.foodDraw(canvas, paint)
+                        snack.snackDraw(canvas, paint, chart)
+                        if(food.enableToDraw){
+                            food.foodDraw(canvas, paint)
+                        }
+
                         //canvas.drawCircle(100f, 100f, 50f, paint)
                     }
                     surfaceHolder.unlockCanvasAndPost(canvas)
@@ -72,6 +77,7 @@ class GameSurfaceView @JvmOverloads constructor (context: Context, attrs: Attrib
                 null,
                 50
             )
+
         }
     }
 
