@@ -8,7 +8,6 @@ import android.graphics.Point
 import android.graphics.RectF
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 
@@ -19,9 +18,13 @@ class Snack(val food:Food) {
     val snHead = Head(inPos = Point(100, 100))
     val snTail:MutableList<Tail> = mutableListOf(Tail(inPos = Point(20, 100), Point(20, 90), Point(20, 110), 10, "r"))
     val eyes = Eyes(food, snHead.posUnder, snHead.posBelow)
+    val tongue = Tongue()
     val snMove:Float = 2.0f
     var isEating:Boolean = false
     var bodyGrow:Int = 0
+    val enableTongueEdgeMax = 105
+    val enableTongueEdgeMin = 100
+    var enableTongueCounter = 0
 
 
 //=====================================================================================================
@@ -88,10 +91,23 @@ class Snack(val food:Food) {
 
         //eyes.pos1 = snHead.posUnder
         //eyes.pos2 = snHead.posBelow
+        if(((snHead.posX > (food.posX-food.width-enableTongueEdgeMax) && snHead.posX < (food.posX-food.width-enableTongueEdgeMin)) && (snHead.posY > (food.posY-food.width-enableTongueEdgeMin) && snHead.posY < (food.posY+food.width+enableTongueEdgeMin)))||
+            ((snHead.posX < (food.posX+food.width+enableTongueEdgeMax) && snHead.posX > (food.posX+food.width+enableTongueEdgeMin)) && (snHead.posY > (food.posY-food.width-enableTongueEdgeMin) && snHead.posY < (food.posY+food.width+enableTongueEdgeMin)))||
+            ((snHead.posY > (food.posY-food.width-enableTongueEdgeMax) && snHead.posY < (food.posY-food.width-enableTongueEdgeMin)) && (snHead.posX > (food.posX-food.width-enableTongueEdgeMin) && snHead.posX < (food.posX+food.width+enableTongueEdgeMin)))||
+            ((snHead.posY < (food.posY+food.width+enableTongueEdgeMax) && snHead.posY > (food.posY+food.width+enableTongueEdgeMin)) && (snHead.posX > (food.posX-food.width-enableTongueEdgeMin) && snHead.posX < (food.posX+food.width+enableTongueEdgeMin)))
+            ){
+            if(enableTongueCounter == 0)enableTongueCounter = 7
+        }
+        if(enableTongueCounter != 0){
+            tongue.moveTongue(pos = Point(snHead.posX, snHead.posY), dir=snHead.dir)
+        }
 
-        eyes.movePupLid()
-        if(((snHead.posX >= food.posX && snHead.posX < (food.posX+food.width)) || (snHead.posX <= food.posX && snHead.posX > (food.posX-food.width))) &&
-            ((snHead.posY >= food.posY && snHead.posY < (food.posY+food.width)) || (snHead.posY <= food.posY && snHead.posY > (food.posY-food.width)))){
+        eyes.movePupLid(pos1 = snHead.posUnder, pos2 = snHead.posBelow, dir = snHead.dir)
+        if(((snHead.posX >= food.posX && snHead.posX < (food.posX+food.width)) ||
+                    (snHead.posX <= food.posX && snHead.posX > (food.posX-food.width))) &&
+            ((snHead.posY >= food.posY && snHead.posY < (food.posY+food.width)) ||
+                    (snHead.posY <= food.posY && snHead.posY > (food.posY-food.width)))
+            ){
             food.enableToDraw = false
             CoroutineScope(Dispatchers.Default).launch {
                 //delay(5000)
@@ -100,6 +116,7 @@ class Snack(val food:Food) {
             }
             bodyGrow = 10
         }
+
         if(!isEating && bodyGrow == 0) {
             chart.chart[snTail[0].posX][snTail[0].posY] = 0
             when (snTail[0].dir) {
@@ -137,12 +154,14 @@ class Snack(val food:Food) {
         }
 
         if(bodyGrow > 0)--bodyGrow
+        if(enableTongueCounter > 0)--enableTongueCounter
         return false
     }
 
 //=====================================================================================================
 
     fun snackDraw(canvas: Canvas, paint: Paint, chart: Chart){
+        if(enableTongueCounter != 0) tongue.drawTongue(canvas, paint)
         paint.color = Color.YELLOW
         paint.style = Paint.Style.FILL
         //paint.strokeWidth = 2.0f
@@ -199,6 +218,8 @@ class Snack(val food:Food) {
         val rectTail = RectF((snTail[0].posX-snHead.width).toFloat(), (snTail[0].posY-snHead.width).toFloat(), (snTail[0].posX+snHead.width).toFloat(), (snTail[0].posY+snHead.width).toFloat())
         canvas.drawArc(rectTail, snTail[0].tailArc(), 180f, false, paint)
         eyes.drawEyes(canvas, paint, snHead.dir)
+
+
         /*paint.color = Color.RED
         for(n in 0 until chart.chart.size){
             for(r in 0 until chart.chart[0].size){

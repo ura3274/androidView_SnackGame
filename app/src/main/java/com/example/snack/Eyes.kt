@@ -13,33 +13,53 @@ import kotlin.math.pow
 import kotlin.math.sin
 import kotlin.math.sqrt
 
-class Eyes(val food: Food, inPos1: Point = Point(), inPos2: Point = Point()) {
-    var pos1 = inPos1
-        set(value){
-            field = value
-            //pupPos1.x = ((radius/2) * cos(atan2((food.posY - value.y).toDouble(), (food.posX - value.x).toDouble())).toInt())+value.x
-            //pupPos1.y = ((radius/2) * sin(atan2((food.posY - value.y).toDouble(), (food.posX - value.x).toDouble())).toInt())+value.y
-        }
-    var pos2 = inPos2
-        set(value){
-            field = value
-            //pupPos2.x = (pupilRadius * cos(atan2((food.posY - value.y).toDouble(), (food.posX - value.x).toDouble())).toInt())+value.x
-            //pupPos2.y = (pupilRadius * sin(atan2((food.posY - value.y).toDouble(), (food.posX - value.x).toDouble())).toInt())+value.y
-        }
+class Eyes(val food: Food, inPos1: Point, inPos2: Point) {
+    var pos1X = inPos1.x
+    var pos1Y = inPos1.y
+    var pos2X = inPos2.x
+    var pos2Y = inPos2.y
     val radius = 10.0
-    val pupPos1 = Point(pos1.x, pos1.y)
-    val pupPos2 = Point(pos2.x, pos2.y)
+    val pupPos1 = Point(pos1X, pos1Y)
+    val pupPos2 = Point(pos2X, pos2Y)
     val pupilRadius = 3
     var up = true
     var angl = 0
     var tm = System.currentTimeMillis()
+    val eyePosOffset = 10
 
 //==================================================================================================
-    fun movePupLid(){
-        pupPos1.x = ((radius/2) * cos(atan2((food.posY - pos1.y).toDouble(), (food.posX - pos1.x).toDouble()))).toInt()+pos1.x
-        pupPos1.y = ((radius/2) * sin(atan2((food.posY - pos1.y).toDouble(), (food.posX - pos1.x).toDouble()))).toInt()+pos1.y
-        pupPos2.x = ((radius/2) * cos(atan2((food.posY - pos2.y).toDouble(), (food.posX - pos2.x).toDouble()))).toInt()+pos2.x
-        pupPos2.y = ((radius/2) * sin(atan2((food.posY - pos2.y).toDouble(), (food.posX - pos2.x).toDouble()))).toInt()+pos2.y
+    fun movePupLid(pos1:Point, pos2:Point, dir:String){
+        when(dir){
+            "r"->{
+                pos1X = pos1.x - eyePosOffset
+                pos1Y = pos1.y
+                pos2X = pos2.x - eyePosOffset
+                pos2Y = pos2.y
+            }
+            "l"->{
+                pos1X = pos1.x + eyePosOffset
+                pos1Y = pos1.y
+                pos2X = pos2.x + eyePosOffset
+                pos2Y = pos2.y
+            }
+            "d"->{
+                pos1X = pos1.x
+                pos1Y = pos1.y - eyePosOffset
+                pos2X = pos2.x
+                pos2Y = pos2.y - eyePosOffset
+            }
+            "u"->{
+                pos1X = pos1.x
+                pos1Y = pos1.y + eyePosOffset
+                pos2X = pos2.x
+                pos2Y = pos2.y + eyePosOffset
+            }
+        }
+
+        pupPos1.x = ((radius/2) * cos(atan2((food.posY - pos1Y).toDouble(), (food.posX - pos1X).toDouble()))).toInt()+pos1X
+        pupPos1.y = ((radius/2) * sin(atan2((food.posY - pos1Y).toDouble(), (food.posX - pos1X).toDouble()))).toInt()+pos1Y
+        pupPos2.x = ((radius/2) * cos(atan2((food.posY - pos2Y).toDouble(), (food.posX - pos2X).toDouble()))).toInt()+pos2X
+        pupPos2.y = ((radius/2) * sin(atan2((food.posY - pos2Y).toDouble(), (food.posX - pos2X).toDouble()))).toInt()+pos2Y
         if(System.currentTimeMillis() - tm > 5000){
             if(up){
                 angl += 5
@@ -56,19 +76,19 @@ class Eyes(val food: Food, inPos1: Point = Point(), inPos2: Point = Point()) {
     fun drawEyes(canvas: Canvas, paint: Paint, headDir: String){
         paint.style = Paint.Style.FILL
         paint.color = Color.WHITE
-        canvas.drawCircle(pos1.x.toFloat(), pos1.y.toFloat(), radius.toFloat(), paint)
-        canvas.drawCircle(pos2.x.toFloat(), pos2.y.toFloat(), radius.toFloat(), paint)
+        canvas.drawCircle(pos1X.toFloat(), pos1Y.toFloat(), radius.toFloat(), paint)
+        canvas.drawCircle(pos2X.toFloat(), pos2Y.toFloat(), radius.toFloat(), paint)
         paint.style = Paint.Style.STROKE
         paint.strokeWidth = 2f
         paint.color = Color.BLACK
-        canvas.drawCircle(pos1.x.toFloat(), pos1.y.toFloat(), radius.toFloat(), paint)
-        canvas.drawCircle(pos2.x.toFloat(), pos2.y.toFloat(), radius.toFloat(), paint)
+        canvas.drawCircle(pos1X.toFloat(), pos1Y.toFloat(), radius.toFloat(), paint)
+        canvas.drawCircle(pos2X.toFloat(), pos2Y.toFloat(), radius.toFloat(), paint)
         paint.style = Paint.Style.FILL
         canvas.drawCircle(pupPos1.x.toFloat(), pupPos1.y.toFloat(), pupilRadius.toFloat(), paint)
         canvas.drawCircle(pupPos2.x.toFloat(), pupPos2.y.toFloat(), pupilRadius.toFloat(), paint)
         paint.color = Color.GREEN
-        val rectHord1 = RectF((pos1.x).toFloat() - (radius).toFloat(), (pos1.y-radius).toFloat(), (pos1.x).toFloat() + (radius).toFloat(), (pos1.y+radius).toFloat())
-        val rectHord2 = RectF((pos2.x).toFloat() - (radius).toFloat(), (pos2.y-radius).toFloat(), (pos2.x).toFloat() + (radius).toFloat(), (pos2.y+radius).toFloat())
+        val rectHord1 = RectF((pos1X).toFloat() - (radius).toFloat(), (pos1Y-radius).toFloat(), (pos1X).toFloat() + (radius).toFloat(), (pos1Y+radius).toFloat())
+        val rectHord2 = RectF((pos2X).toFloat() - (radius).toFloat(), (pos2Y-radius).toFloat(), (pos2X).toFloat() + (radius).toFloat(), (pos2Y+radius).toFloat())
         //val path = Path()
         //path.moveTo((pos1.x).toFloat() - (hord/2).toFloat(), (pos1.y - 5).toFloat())
         //path.arcTo(rectHord, (270-angl).toFloat(), (angl*2).toFloat(), true)

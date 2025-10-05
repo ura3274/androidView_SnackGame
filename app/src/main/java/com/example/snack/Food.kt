@@ -51,5 +51,7 @@ class Food(inPos: Point) {
         paint.color = Color.RED
         paint.style = Paint.Style.FILL
         canvas.drawCircle(posX.toFloat(), posY.toFloat(), width.toFloat(), paint)
+        //paint.style = Paint.Style.STROKE
+        //canvas.drawCircle(posX.toFloat(), posY.toFloat(), width+50.toFloat(), paint)
     }
 }
