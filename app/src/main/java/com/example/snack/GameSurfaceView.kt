@@ -18,7 +18,11 @@ import androidx.core.os.HandlerCompat
 import androidx.lifecycle.LifecycleCoroutineScope
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class GameSurfaceView @JvmOverloads constructor (context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0) : SurfaceView(context, attrs, defStyleAttr), SurfaceHolder.Callback {
@@ -27,6 +31,10 @@ class GameSurfaceView @JvmOverloads constructor (context: Context, attrs: Attrib
     private val food:Food = Food(Point(250,300))
     private val snack: Snack = Snack(food)
     private var svCallBack:OnFinishGameCallBack? = null
+    private val foodCoroutineScope = CoroutineScope(SupervisorJob()+ Dispatchers.Default )
+    private var foodCoroutineRun = false
+    var gg:(()->Unit)? = null
+    private var stopGame = false
 
     init {
         holder.addCallback(this)
@@ -36,11 +44,23 @@ class GameSurfaceView @JvmOverloads constructor (context: Context, attrs: Attrib
     override fun surfaceCreated(holder: SurfaceHolder) {
         thread?.running = true
         thread?.start()
+        foodCoroutineRun = true
+        foodCoroutineScope.launch {
+            while (foodCoroutineRun){
+                if(!food.enableToDraw){
+                    //delay(5000)
+                    food.foodMove(chart)
+                    food.enableToDraw = true
+                    //Log.d("myLog", "ennn")
+                }
+            }
+        }
 
     }
 
     override fun surfaceDestroyed(holder: SurfaceHolder) {
-        //stopGame()
+        stopGame()
+        Log.d("myLog", "destroyed")
     }
 
     override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {}
@@ -59,6 +79,7 @@ class GameSurfaceView @JvmOverloads constructor (context: Context, attrs: Attrib
                         canvas.drawColor(Color.BLACK) // Очистка экрана
                         if(snack.snackMove(chart)){
                             running = false
+                            stopGame = true
                         }
 
                         snack.snackDraw(canvas, paint, chart)
@@ -71,12 +92,15 @@ class GameSurfaceView @JvmOverloads constructor (context: Context, attrs: Attrib
                     surfaceHolder.unlockCanvasAndPost(canvas)
                 }
             }
-            HandlerCompat.postDelayed(
-                Handler(Looper.getMainLooper()),
-                { stopGame() },
-                null,
-                50
-            )
+            if(stopGame){
+                HandlerCompat.postDelayed(
+                    Handler(Looper.getMainLooper()),
+                    { svCallBack?.finishGame() },
+                    null,
+                    50
+                )
+            }
+
 
         }
     }
@@ -127,6 +151,9 @@ class GameSurfaceView @JvmOverloads constructor (context: Context, attrs: Attrib
 
     fun stopGame(){
         //var retry = true
+        Log.d("myLog", "stopped")
+        foodCoroutineRun = false
+        foodCoroutineScope.cancel()
         thread?.running = false
         //while (retry) {
             try {
@@ -137,6 +164,6 @@ class GameSurfaceView @JvmOverloads constructor (context: Context, attrs: Attrib
             }
         //}
         thread = null
-        svCallBack?.finishGame()
+        //svCallBack?.finishGame()
     }
 }

@@ -6,8 +6,10 @@ import android.graphics.Paint
 import android.graphics.Path
 import android.graphics.Point
 import android.graphics.RectF
+import android.util.Log
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 
 
@@ -26,6 +28,8 @@ class Snack(val food:Food) {
     val enableTongueEdgeMax = 105
     val enableTongueEdgeMin = 100
     var enableTongueCounter = 0
+    var enableMouth = false
+    var mouthWidth = 0
 
 
 //=====================================================================================================
@@ -89,9 +93,8 @@ class Snack(val food:Food) {
                 snHead.posY -= snMove.toInt()
             }
         }
+        //=========== Move Tongue =================================================================
 
-        //eyes.pos1 = snHead.posUnder
-        //eyes.pos2 = snHead.posBelow
         if(((snHead.posX > (food.posX-food.width-enableTongueEdgeMax) && snHead.posX < (food.posX-food.width-enableTongueEdgeMin)) && (snHead.posY > (food.posY-food.width-enableTongueEdgeMin) && snHead.posY < (food.posY+food.width+enableTongueEdgeMin)))||
             ((snHead.posX < (food.posX+food.width+enableTongueEdgeMax) && snHead.posX > (food.posX+food.width+enableTongueEdgeMin)) && (snHead.posY > (food.posY-food.width-enableTongueEdgeMin) && snHead.posY < (food.posY+food.width+enableTongueEdgeMin)))||
             ((snHead.posY > (food.posY-food.width-enableTongueEdgeMax) && snHead.posY < (food.posY-food.width-enableTongueEdgeMin)) && (snHead.posX > (food.posX-food.width-enableTongueEdgeMin) && snHead.posX < (food.posX+food.width+enableTongueEdgeMin)))||
@@ -102,22 +105,34 @@ class Snack(val food:Food) {
         if(enableTongueCounter != 0){
             tongue.moveTongue(pos = Point(snHead.posX, snHead.posY), dir=snHead.dir)
         }
-        mouth.moveMouth(Point(snHead.posX, snHead.posY), snHead.dir)
+
+        //============ Move Mouth =================================================================
+
+        if((snHead.posX > (food.posX-food.width-50) && snHead.posX < (food.posX+food.width+50))&&
+            (snHead.posY > (food.posY-food.width-50) && snHead.posY < (food.posY+food.width+50))
+        ) enableMouth = true else enableMouth = false
+
+        if(enableMouth && mouthWidth <20) ++mouthWidth else if(!enableMouth && mouthWidth > 0) --mouthWidth
+
+        if(enableMouth || mouthWidth > 0){
+            mouth.moveMouth(Point(snHead.posX, snHead.posY),mouthWidth, snHead.dir)
+        }
+
+        //============ Move Eyes ==================================================================
         eyes.movePupLid(pos1 = snHead.posUnder, pos2 = snHead.posBelow, dir = snHead.dir)
+
+        //============ Move Food and Body Grow ====================================================
         if(((snHead.posX >= food.posX && snHead.posX < (food.posX+food.width)) ||
                     (snHead.posX <= food.posX && snHead.posX > (food.posX-food.width))) &&
             ((snHead.posY >= food.posY && snHead.posY < (food.posY+food.width)) ||
                     (snHead.posY <= food.posY && snHead.posY > (food.posY-food.width)))
             ){
             food.enableToDraw = false
-            CoroutineScope(Dispatchers.Default).launch {
-                //delay(5000)
-                food.foodMove(chart)
-                food.enableToDraw = true
-            }
+
             bodyGrow = 10
         }
 
+        //=========== Move Tail ===================================================================
         if(!isEating && bodyGrow == 0) {
             chart.chart[snTail[0].posX][snTail[0].posY] = 0
             when (snTail[0].dir) {
@@ -156,6 +171,7 @@ class Snack(val food:Food) {
 
         if(bodyGrow > 0)--bodyGrow
         if(enableTongueCounter > 0)--enableTongueCounter
+
         return false
     }
 
@@ -219,8 +235,10 @@ class Snack(val food:Food) {
         canvas.drawArc(rectHead, snHead.headArc(), 180f, false, paint)
         val rectTail = RectF((snTail[0].posX-snHead.width).toFloat(), (snTail[0].posY-snHead.width).toFloat(), (snTail[0].posX+snHead.width).toFloat(), (snTail[0].posY+snHead.width).toFloat())
         canvas.drawArc(rectTail, snTail[0].tailArc(), 180f, false, paint)
+
         eyes.drawEyes(canvas, paint, snHead.dir)
-        mouth.drawMouth(canvas, paint)
+
+        if(enableMouth || mouthWidth > 0) mouth.drawMouth(canvas, paint)
 
 
         /*paint.color = Color.RED

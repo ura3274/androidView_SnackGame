@@ -4,7 +4,7 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Point
-import android.util.Log
+//import android.util.Log
 import kotlin.random.Random
 
 class Food(inPos: Point) {
@@ -22,12 +22,12 @@ class Food(inPos: Point) {
             if(chart.chart[posX][posY] == 1) continue
             for(n in 1..25){
                 if(chart.chart[posX+n][posY] == 1){
-                    Log.d("myLog", "enter")
+                    //Log.d("myLog", "enter")
                     flag = false
                     break
                 }else flag = true
                 if(chart.chart[posX-n][posY] == 1){
-                    Log.d("myLog", "enter")
+                    //Log.d("myLog", "enter")
                     flag = false
                     break
                 }else flag = true
