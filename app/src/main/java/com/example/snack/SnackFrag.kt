@@ -8,10 +8,18 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.Toast
+import androidx.activity.addCallback
+import androidx.navigation.fragment.findNavController
 
 class SnackFrag : Fragment(), GameSurfaceView.OnFinishGameCallBack {
 
     var surf: GameSurfaceView? = null
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        requireActivity().onBackPressedDispatcher.addCallback(this){
+            findNavController().popBackStack()
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,

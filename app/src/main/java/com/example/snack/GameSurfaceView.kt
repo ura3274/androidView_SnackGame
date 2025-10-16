@@ -22,6 +22,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -48,11 +49,12 @@ class GameSurfaceView @JvmOverloads constructor (context: Context, attrs: Attrib
         foodCoroutineScope.launch {
             while (foodCoroutineRun){
                 if(!food.enableToDraw){
-                    //delay(5000)
+                    //delay(5000L)
                     food.foodMove(chart)
                     food.enableToDraw = true
                     //Log.d("myLog", "ennn")
                 }
+                delay(16L)
             }
         }
 
@@ -76,6 +78,7 @@ class GameSurfaceView @JvmOverloads constructor (context: Context, attrs: Attrib
                     synchronized(surfaceHolder) {
                         // Обновление логики игры
                         // Рисование на Canvas
+                        //sleep(100L)
                         canvas.drawColor(Color.BLACK) // Очистка экрана
                         if(snack.snackMove(chart)){
                             running = false
