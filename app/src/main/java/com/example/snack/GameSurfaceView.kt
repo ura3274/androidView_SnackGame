@@ -78,7 +78,7 @@ class GameSurfaceView @JvmOverloads constructor (context: Context, attrs: Attrib
                     synchronized(surfaceHolder) {
                         // Обновление логики игры
                         // Рисование на Canvas
-                        //sleep(100L)
+                        sleep(500L)
                         canvas.drawColor(Color.BLACK) // Очистка экрана
                         if(snack.snackMove(chart)){
                             running = false

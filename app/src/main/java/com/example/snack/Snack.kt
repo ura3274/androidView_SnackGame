@@ -36,7 +36,10 @@ class Snack(val food:Food) {
     var enableMouth = false
     var mouthWidth = 0
     var drawHead = false
-    var headTurn = 45
+    var headTurn = 0f
+    var drawTail = false
+    var tailTurn = 0f
+    var clockwiseTail = false
 
 
 //=====================================================================================================
@@ -48,19 +51,22 @@ class Snack(val food:Food) {
         when(dir){
             "r" ->{
                 if(turn){
-                    if(headTurn == 45){
+                    if(drawHead) headTurn += 15f
+                    if(headTurn == 0f){
                         snTail.add(Tail(Point(snHead.posX, snHead.posY), Point(snHead.posUnder.x, snHead.posUnder.y),Point(snHead.posBelow.x, snHead.posBelow.y),10, snHead.dir))
-                        snHead.posX = (if(snHead.dir == "d")snHead.posUnder.x else snHead.posBelow.x)+(10.0 * sin(Math.toRadians(if(snHead.dir == "d")225.0 else 315.0))).toInt()
-                        snHead.posY = (if(snHead.dir == "d")snHead.posUnder.y else snHead.posBelow.y)-(10.0 * cos(Math.toRadians(if(snHead.dir == "d")225.0 else 315.0))).toInt()
-                        headTurn = 90
+                        headTurn += 15f
                         drawHead = true
-                    }else if(headTurn == 90){
+                    }else if(headTurn == 90f){
                         snHead.posX = snTail[snTail.lastIndex].posX+10
                         snHead.posY = if(snTail[snTail.lastIndex].dir == "d")snTail[snTail.lastIndex].posY+10 else snTail[snTail.lastIndex].posY-10
                         snHead.dir = "r"
                         snTail.add(Tail(Point(snHead.posX, snHead.posY), Point(snHead.posUnder.x, snHead.posUnder.y),Point(snHead.posBelow.x, snHead.posBelow.y),10, snHead.dir))
                         turn = false
-                        headTurn = 45
+                        headTurn = 0f
+                        drawHead = false
+                    }else{
+                        snHead.posX = (if(snTail[snTail.lastIndex].dir == "d")snTail[snTail.lastIndex].posUnder.x else snTail[snTail.lastIndex].posBelow.x)+(10.0 * sin(Math.toRadians(if(snTail[snTail.lastIndex].dir == "d")270.0-headTurn else 270.0+headTurn))).toInt()
+                        snHead.posY = (if(snTail[snTail.lastIndex].dir == "d")snTail[snTail.lastIndex].posUnder.y else snTail[snTail.lastIndex].posBelow.y)-(10.0 * cos(Math.toRadians(if(snTail[snTail.lastIndex].dir == "d")270.0-headTurn else 270.0+headTurn))).toInt()
                     }
                 }
                 if(!turn){
@@ -73,20 +79,22 @@ class Snack(val food:Food) {
             //================================================================================
             "l" ->{
                 if(turn){
-                    if(headTurn == 45) {
-                        snTail.add(
-                            Tail(Point(snHead.posX, snHead.posY), Point(snHead.posUnder.x, snHead.posUnder.y), Point(snHead.posBelow.x, snHead.posBelow.y), 10, snHead.dir))
-                        snHead.posX = (if(snHead.dir == "d")snHead.posBelow.x else snHead.posUnder.x)+(10.0 * sin(Math.toRadians(if(snHead.dir == "d")135.0 else 45.0))).toInt()
-                        snHead.posY = (if(snHead.dir == "d")snHead.posBelow.y else snHead.posUnder.y)-(10.0 * cos(Math.toRadians(if(snHead.dir == "d")135.0 else 45.0))).toInt()
+                    if(drawHead) headTurn += 15f
+                    if(headTurn == 0f) {
+                        snTail.add(Tail(Point(snHead.posX, snHead.posY), Point(snHead.posUnder.x, snHead.posUnder.y), Point(snHead.posBelow.x, snHead.posBelow.y), 10, snHead.dir))
                         drawHead = true
-                        headTurn = 90
-                    }else if(headTurn == 90) {
+                        headTurn += 15f
+                    }else if(headTurn == 90f) {
                         snHead.posX = snTail[snTail.lastIndex].posX - 10
                         snHead.posY = if(snTail[snTail.lastIndex].dir == "d")snTail[snTail.lastIndex].posY + 10 else snTail[snTail.lastIndex].posY - 10
                         snHead.dir = "l"
                         snTail.add(Tail(Point(snHead.posX, snHead.posY), Point(snHead.posUnder.x, snHead.posUnder.y), Point(snHead.posBelow.x, snHead.posBelow.y), 10, snHead.dir))
                         turn = false
-                        headTurn = 45
+                        headTurn = 0f
+                        drawHead = false
+                    }else{
+                        snHead.posX = (if(snTail[snTail.lastIndex].dir == "d")snTail[snTail.lastIndex].posBelow.x else snTail[snTail.lastIndex].posUnder.x)+(10.0 * sin(Math.toRadians(if(snTail[snTail.lastIndex].dir == "d")90.0+headTurn else 90.0-headTurn))).toInt()
+                        snHead.posY = (if(snTail[snTail.lastIndex].dir == "d")snTail[snTail.lastIndex].posBelow.y else snTail[snTail.lastIndex].posUnder.y)-(10.0 * cos(Math.toRadians(if(snTail[snTail.lastIndex].dir == "d")90.0+headTurn else 90.0-headTurn))).toInt()
                     }
                 }
                 if(!turn){
@@ -99,20 +107,23 @@ class Snack(val food:Food) {
             //==================================================================================
             "d" ->{
                 if(turn){
-                    if(headTurn == 45){
+                    if(drawHead) headTurn += 15f
+                    if(headTurn == 0f){
                         snTail.add(Tail(Point(snHead.posX, snHead.posY), Point(snHead.posUnder.x, snHead.posUnder.y),Point(snHead.posBelow.x, snHead.posBelow.y),10, snHead.dir))
                         //snHead.dir = "d"
-                        snHead.posX = (if(snHead.dir == "r")snHead.posBelow.x else snHead.posUnder.x)+(10.0 * sin(Math.toRadians(if(snHead.dir == "r")45.0 else 315.0))).toInt()
-                        snHead.posY = (if(snHead.dir == "r")snHead.posBelow.y else snHead.posUnder.y)-(10.0 * cos(Math.toRadians(if(snHead.dir == "r")45.0 else 315.0))).toInt()
                         drawHead = true
-                        headTurn = 90
-                    }else if(headTurn == 90){
+                        headTurn += 15f
+                    }else if(headTurn == 90f){
                         snHead.posY = snTail[snTail.lastIndex].posY+10
                         snHead.posX = if(snTail[snTail.lastIndex].dir=="r")snTail[snTail.lastIndex].posX+10 else snTail[snTail.lastIndex].posX-10
                         snHead.dir = "d"
                         snTail.add(Tail(Point(snHead.posX, snHead.posY), Point(snHead.posUnder.x, snHead.posUnder.y),Point(snHead.posBelow.x, snHead.posBelow.y),10, snHead.dir))
                         turn = false
-                        headTurn = 45
+                        headTurn = 0f
+                        drawHead = false
+                    }else{
+                        snHead.posX = (if(snTail[snTail.lastIndex].dir == "r")snTail[snTail.lastIndex].posBelow.x else snTail[snTail.lastIndex].posUnder.x)+(10.0 * sin(Math.toRadians(if(snTail[snTail.lastIndex].dir == "r")headTurn.toDouble() else 360.0-headTurn.toDouble()))).toInt()
+                        snHead.posY = (if(snTail[snTail.lastIndex].dir == "r")snTail[snTail.lastIndex].posBelow.y else snTail[snTail.lastIndex].posUnder.y)-(10.0 * cos(Math.toRadians(if(snTail[snTail.lastIndex].dir == "r")headTurn.toDouble() else 360.0-headTurn.toDouble()))).toInt()
                     }
                 }
                 if(!turn){
@@ -125,19 +136,22 @@ class Snack(val food:Food) {
             //======================================================================================
             "u" ->{
                 if(turn){
-                    if(headTurn == 45) {
+                    if(drawHead) headTurn += 15f
+                    if(headTurn == 0f) {
                         snTail.add(Tail(Point(snHead.posX, snHead.posY), Point(snHead.posUnder.x, snHead.posUnder.y), Point(snHead.posBelow.x, snHead.posBelow.y), 10, snHead.dir))
-                        snHead.posX = (if(snHead.dir == "r")snHead.posUnder.x else snHead.posBelow.x)+(10.0 * sin(Math.toRadians(if(snHead.dir == "r")135.0 else 225.0))).toInt()
-                        snHead.posY = (if(snHead.dir == "r")snHead.posUnder.y else snHead.posBelow.y)-(10.0 * cos(Math.toRadians(if(snHead.dir == "r")135.0 else 225.0))).toInt()
                         drawHead = true
-                        headTurn = 90
-                    }else if(headTurn == 90) {
+                        headTurn += 15f
+                    }else if(headTurn == 90f) {
                         snHead.posY = snTail[snTail.lastIndex].posY-10
                         snHead.posX = if(snTail[snTail.lastIndex].dir == "r")snTail[snTail.lastIndex].posX+10 else snTail[snTail.lastIndex].posX-10
                         snHead.dir = "u"
                         snTail.add(Tail(Point(snHead.posX, snHead.posY), Point(snHead.posUnder.x, snHead.posUnder.y), Point(snHead.posBelow.x, snHead.posBelow.y), 10, snHead.dir))
                         turn = false
-                        headTurn = 45
+                        headTurn = 0f
+                        drawHead = false
+                    }else{
+                        snHead.posX = (if(snTail[snTail.lastIndex].dir == "r")snTail[snTail.lastIndex].posUnder.x else snTail[snTail.lastIndex].posBelow.x)+(10.0 * sin(Math.toRadians(if(snTail[snTail.lastIndex].dir == "r")180.0-headTurn else 180.0+headTurn.toDouble()))).toInt()
+                        snHead.posY = (if(snTail[snTail.lastIndex].dir == "r")snTail[snTail.lastIndex].posUnder.y else snTail[snTail.lastIndex].posBelow.y)-(10.0 * cos(Math.toRadians(if(snTail[snTail.lastIndex].dir == "r")180.0-headTurn else 180.0+headTurn.toDouble()))).toInt()
                     }
                 }
                 if(!turn){
@@ -188,38 +202,72 @@ class Snack(val food:Food) {
         }
 
         //=========== Move Tail ===================================================================
-        if(!isEating && bodyGrow == 0 && !turn) {
+        if(!isEating && bodyGrow == 0) {
             chart.chart[snTail[0].posX][snTail[0].posY] = 0
-            when (snTail[0].dir) {
-                "r" -> {
-                    for(n in 1.. snMove.toInt()){
-                        chart.chart[snTail[0].posX - n][snTail[0].posY] = 0
+            if(!drawTail){
+                when (snTail[0].dir) {
+                    "r" -> {
+                        for(n in 1.. snMove.toInt()){
+                            chart.chart[snTail[0].posX - n][snTail[0].posY] = 0
+                        }
+                        snTail[0].posX += snMove.toInt()
                     }
-                    snTail[0].posX += snMove.toInt()
-                }
-                "l" -> {
-                    for(n in 1.. snMove.toInt()){
-                        chart.chart[snTail[0].posX + n][snTail[0].posY] = 0
+                    "l" -> {
+                        for(n in 1.. snMove.toInt()){
+                            chart.chart[snTail[0].posX + n][snTail[0].posY] = 0
+                        }
+                        snTail[0].posX -= snMove.toInt()
                     }
-                    snTail[0].posX -= snMove.toInt()
-                }
-                "d" -> {
-                    for(n in 1.. snMove.toInt()){
-                        chart.chart[snTail[0].posX][snTail[0].posY - n] = 0
+                    "d" -> {
+                        for(n in 1.. snMove.toInt()){
+                            chart.chart[snTail[0].posX][snTail[0].posY - n] = 0
+                        }
+                        snTail[0].posY += snMove.toInt()
                     }
-                    snTail[0].posY += snMove.toInt()
-                }
-                "u" -> {
-                    for(n in 1.. snMove.toInt()){
-                        chart.chart[snTail[0].posX][snTail[0].posY + n] = 0
+                    "u" -> {
+                        for(n in 1.. snMove.toInt()){
+                            chart.chart[snTail[0].posX][snTail[0].posY + n] = 0
+                        }
+                        snTail[0].posY -= snMove.toInt()
                     }
-                    snTail[0].posY -= snMove.toInt()
                 }
             }
+
             if (snTail.size > 1) {
-                if (snTail[0].posX == snTail[1].posX && snTail[0].posY == snTail[1].posY) {
-                    snTail.removeAt(0)
-                    snTail.removeAt(0)
+                if ((snTail[0].posX == snTail[1].posX && snTail[0].posY == snTail[1].posY) || drawTail) {
+                    if(tailTurn == 0f){
+                        drawTail = true
+                        snTail.removeAt(0)
+                    }
+                    tailTurn += 15
+                    when(snTail[0].dir){
+                        "r"->{
+                            snTail[0].posX = (if(snTail[1].dir == "d")snTail[1].posBelow.x else snTail[1].posUnder.x)+(10.0 * sin(Math.toRadians(if(snTail[1].dir == "d")tailTurn.toDouble() else 180.0-tailTurn))).toInt()
+                            snTail[0].posY = (if(snTail[1].dir == "d")snTail[1].posBelow.y else snTail[1].posUnder.y)-(10.0 * cos(Math.toRadians(if(snTail[1].dir == "d")tailTurn.toDouble() else 180.0-tailTurn))).toInt()
+                            clockwiseTail = if(snTail[1].dir == "d")true else false
+                        }
+                        "l"->{
+                            snTail[0].posX = (if(snTail[1].dir == "u")snTail[1].posBelow.x else snTail[1].posUnder.x)+(10.0 * sin(Math.toRadians(if(snTail[1].dir == "u")180.0+tailTurn else 360.0-tailTurn))).toInt()
+                            snTail[0].posY = (if(snTail[1].dir == "u")snTail[1].posBelow.y else snTail[1].posUnder.y)-(10.0 * cos(Math.toRadians(if(snTail[1].dir == "u")180.0+tailTurn else 360.0-tailTurn))).toInt()
+                            clockwiseTail = if(snTail[1].dir == "u")true else false
+                        }
+                        "d"->{
+                            snTail[0].posX = (if(snTail[1].dir == "r")snTail[1].posUnder.x else snTail[1].posBelow.x)+(10.0 * sin(Math.toRadians(if(snTail[1].dir == "r")270.0-headTurn else 90.0+headTurn))).toInt()
+                            snTail[0].posY = (if(snTail[1].dir == "r")snTail[1].posUnder.y else snTail[1].posBelow.y)-(10.0 * cos(Math.toRadians(if(snTail[1].dir == "r")270.0-headTurn else 90.0+headTurn))).toInt()
+                            clockwiseTail = if(snTail[1].dir == "l")true else false
+                        }
+                        "u"->{
+                            snTail[0].posX = (if(snTail[1].dir == "l")snTail[1].posUnder.x else snTail[1].posBelow.x)+(10.0 * sin(Math.toRadians(if(snTail[1].dir == "d")90.0-headTurn else 270.0+headTurn))).toInt()
+                            snTail[0].posY = (if(snTail[1].dir == "l")snTail[1].posUnder.y else snTail[1].posBelow.y)-(10.0 * cos(Math.toRadians(if(snTail[1].dir == "d")90.0-headTurn else 270.0+headTurn))).toInt()
+                            clockwiseTail = if(snTail[1].dir == "r")true else false
+                        }
+                    }
+                    if(tailTurn == 90f){
+                        snTail.removeAt(0)
+                        drawTail = false
+                        tailTurn = 0f
+                    }
+
                 }
             }
         }
@@ -239,22 +287,41 @@ class Snack(val food:Food) {
         paint.style = Paint.Style.FILL
         //paint.strokeWidth = 2.0f
         val path = Path()
-        path.moveTo(snTail[0].posUnder.x.toFloat(), snTail[0].posUnder.y.toFloat())
-        if(snTail.size > 1){
-            for(i in 1..snTail.lastIndex){
+        if(!drawTail){
+            path.moveTo(snTail[0].posUnder.x.toFloat(), snTail[0].posUnder.y.toFloat())
+        }else if(!clockwiseTail){
+            path.moveTo(snTail[1].posUnder.x.toFloat(), snTail[1].posUnder.y.toFloat())
+        }
+        if(drawTail){
+            if(snTail[0].dir == "r" && snTail[1].dir == "d"){//
+                val rectBend = RectF((snTail[1].posX-30).toFloat(), (snTail[1].posY-20).toFloat(), (snTail[1].posX+10).toFloat(),(snTail[1].posY+30).toFloat())
+                path.arcTo(rectBend, 270f+tailTurn, 90f-tailTurn, false )
+            }else if(snTail[0].dir == "l" && snTail[1].dir == "u"){//i
+                val rectBend = RectF((snTail[1].posX-10).toFloat(), (snTail[1].posY-30).toFloat(), (snTail[1].posX+30).toFloat(),(snTail[1].posY+20).toFloat())
+                path.arcTo(rectBend, 90f+tailTurn, 90f-tailTurn, false )
+            }else if(snTail[0].dir == "d" && snTail[1].dir == "l"){//
+                val rectBend = RectF((snTail[1].posX-30).toFloat(), (snTail[1].posY-30).toFloat(), (snTail[1].posX+20).toFloat(),(snTail[1].posY+10).toFloat())
+                path.arcTo(rectBend, 0f+tailTurn, 90f-tailTurn, false )
+            }else if(snTail[0].dir == "u" && snTail[1].dir == "r"){
+                val rectBend = RectF((snTail[1].posX-20).toFloat(), (snTail[1].posY-10).toFloat(), (snTail[1].posX+30).toFloat(),(snTail[1].posY+30).toFloat())
+                path.arcTo(rectBend, 180f+tailTurn, 90f-tailTurn, false )
+            }
+        }
+        if(snTail.size > (if(drawTail)2 else 1)){
+            for(i in (if(drawTail)2 else 1)..snTail.lastIndex){
                 //val rectBend = RectF((snTail[i].posX-10).toFloat(), (snTail[i].posY-20).toFloat(), (snTail[i].posX+10).toFloat(),(snTail[i].posY).toFloat())
                 if(snTail[i].dir != snTail[i-1].dir){
                     if(snTail[i].dir == "d" && snTail[i-1].dir == "r"){
-                        val rectBend = RectF((snTail[i].posX-10).toFloat(), (snTail[i].posY-20).toFloat(), (snTail[i].posX+10).toFloat(),(snTail[i].posY).toFloat())
+                        val rectBend = RectF((snTail[i].posX-30).toFloat(), (snTail[i].posY-20).toFloat(), (snTail[i].posX+10).toFloat(),(snTail[i].posY+30).toFloat())
                         path.arcTo(rectBend, 270f, 90f, false )
                     }else if(snTail[i].dir == "u" && snTail[i-1].dir == "l"){
-                        val rectBend = RectF((snTail[i].posX-10).toFloat(), (snTail[i].posY).toFloat(), (snTail[i].posX+10).toFloat(),(snTail[i].posY+20).toFloat())
+                        val rectBend = RectF((snTail[i].posX-10).toFloat(), (snTail[i].posY-30).toFloat(), (snTail[i].posX+30).toFloat(),(snTail[i].posY+20).toFloat())
                         path.arcTo(rectBend, 90f, 90f, false )
                     }else if(snTail[i].dir == "r" && snTail[i-1].dir == "u"){
-                        val rectBend = RectF((snTail[i].posX-20).toFloat(), (snTail[i].posY-10).toFloat(), (snTail[i].posX).toFloat(),(snTail[i].posY+10).toFloat())
+                        val rectBend = RectF((snTail[i].posX-20).toFloat(), (snTail[i].posY-10).toFloat(), (snTail[i].posX+30).toFloat(),(snTail[i].posY+30).toFloat())
                         path.arcTo(rectBend, 180f, 90f, false )
                     }else if(snTail[i].dir == "l" && snTail[i-1].dir == "d"){
-                        val rectBend = RectF((snTail[i].posX).toFloat(), (snTail[i].posY-10).toFloat(), (snTail[i].posX+20).toFloat(),(snTail[i].posY+10).toFloat())
+                        val rectBend = RectF((snTail[i].posX-30).toFloat(), (snTail[i].posY-30).toFloat(), (snTail[i].posX+20).toFloat(),(snTail[i].posY+10).toFloat())
                         path.arcTo(rectBend, 0f, 90f, false )
                     }else{
                         path.lineTo(snTail[i].posUnder.x.toFloat(), snTail[i].posUnder.y.toFloat())
@@ -269,29 +336,29 @@ class Snack(val food:Food) {
             //path.lineTo((snHead.posUnder.x+(10*sin(Math.toRadians(45.0)))).toFloat(), (snHead.posUnder.y-(10*cos(Math.toRadians(45.0)))).toFloat())
 
             if(snTail[snTail.lastIndex].dir == "r" && dir == "d"){//i
-                val rectBend = RectF((snTail[snTail.lastIndex].posX).toFloat(), (snTail[snTail.lastIndex].posY-10).toFloat(), (snTail[snTail.lastIndex].posX+20).toFloat(),(snTail[snTail.lastIndex].posY+40).toFloat())
-                path.arcTo(rectBend, 270f, 45f, false )
+                val rectBend = RectF((snTail[snTail.lastIndex].posX-20).toFloat(), (snTail[snTail.lastIndex].posY-10).toFloat(), (snTail[snTail.lastIndex].posX+20).toFloat(),(snTail[snTail.lastIndex].posY+40).toFloat())
+                path.arcTo(rectBend, 270f, headTurn, false )
             }else if(snTail[snTail.lastIndex].dir == "l" && dir == "u"){//i
-                val rectBend = RectF((snTail[snTail.lastIndex].posX-20).toFloat(), (snTail[snTail.lastIndex].posY-40).toFloat(), (snTail[snTail.lastIndex].posX).toFloat(),(snTail[snTail.lastIndex].posY+10).toFloat())
-                path.arcTo(rectBend, 90f, 45f, false )
+                val rectBend = RectF((snTail[snTail.lastIndex].posX-20).toFloat(), (snTail[snTail.lastIndex].posY-40).toFloat(), (snTail[snTail.lastIndex].posX+20).toFloat(),(snTail[snTail.lastIndex].posY+10).toFloat())
+                path.arcTo(rectBend, 90f, headTurn, false )
             }else if(snTail[snTail.lastIndex].dir == "r" && dir == "u"){//i
-                val rectBend = RectF((snTail[snTail.lastIndex].posX).toFloat(), (snTail[snTail.lastIndex].posY-40).toFloat(), (snTail[snTail.lastIndex].posX+20).toFloat(),(snTail[snTail.lastIndex].posY+10).toFloat())
-                path.arcTo(rectBend, 45f, 45f, false )
+                val rectBend = RectF((snTail[snTail.lastIndex].posX-20).toFloat(), (snTail[snTail.lastIndex].posY-40).toFloat(), (snTail[snTail.lastIndex].posX+20).toFloat(),(snTail[snTail.lastIndex].posY+10).toFloat())
+                path.arcTo(rectBend, 90f-headTurn, headTurn, false )
             }else if(snTail[snTail.lastIndex].dir == "l" && dir == "d"){//i
-                val rectBend = RectF((snTail[snTail.lastIndex].posX-20).toFloat(), (snTail[snTail.lastIndex].posY-10).toFloat(), (snTail[snTail.lastIndex].posX).toFloat(),(snTail[snTail.lastIndex].posY+40).toFloat())
-                path.arcTo(rectBend, 225f, 45f, false )
+                val rectBend = RectF((snTail[snTail.lastIndex].posX-20).toFloat(), (snTail[snTail.lastIndex].posY-10).toFloat(), (snTail[snTail.lastIndex].posX+20).toFloat(),(snTail[snTail.lastIndex].posY+40).toFloat())
+                path.arcTo(rectBend, 270f-headTurn, headTurn, false )
             }else if(snTail[snTail.lastIndex].dir == "u" && dir == "l"){//i
-                val rectBend = RectF((snTail[snTail.lastIndex].posX-40).toFloat(), (snTail[snTail.lastIndex].posY-20).toFloat(), (snTail[snTail.lastIndex].posX+10).toFloat(),(snTail[snTail.lastIndex].posY).toFloat())
-                path.arcTo(rectBend, 315f, 45f, false )
+                val rectBend = RectF((snTail[snTail.lastIndex].posX-40).toFloat(), (snTail[snTail.lastIndex].posY-20).toFloat(), (snTail[snTail.lastIndex].posX+10).toFloat(),(snTail[snTail.lastIndex].posY+20).toFloat())
+                path.arcTo(rectBend, 360f-headTurn, headTurn, false )
             }else if(snTail[snTail.lastIndex].dir == "d" && dir == "r"){
-                val rectBend = RectF((snTail[snTail.lastIndex].posX-10).toFloat(), (snTail[snTail.lastIndex].posY).toFloat(), (snTail[snTail.lastIndex].posX+40).toFloat(),(snTail[snTail.lastIndex].posY+20).toFloat())
-                path.arcTo(rectBend, 135f, 45f, false )
+                val rectBend = RectF((snTail[snTail.lastIndex].posX-10).toFloat(), (snTail[snTail.lastIndex].posY-20).toFloat(), (snTail[snTail.lastIndex].posX+40).toFloat(),(snTail[snTail.lastIndex].posY+20).toFloat())
+                path.arcTo(rectBend, 180f-headTurn, headTurn, false )
             }else if(snTail[snTail.lastIndex].dir == "d" && dir == "l"){
-                val rectBend = RectF((snTail[snTail.lastIndex].posX-40).toFloat(), (snTail[snTail.lastIndex].posY).toFloat(), (snTail[snTail.lastIndex].posX+10).toFloat(),(snTail[snTail.lastIndex].posY+20).toFloat())
-                path.arcTo(rectBend, 0f, 45f, false )
+                val rectBend = RectF((snTail[snTail.lastIndex].posX-40).toFloat(), (snTail[snTail.lastIndex].posY-20).toFloat(), (snTail[snTail.lastIndex].posX+10).toFloat(),(snTail[snTail.lastIndex].posY+20).toFloat())
+                path.arcTo(rectBend, 0f, headTurn, false )
             }else if(snTail[snTail.lastIndex].dir == "u" && dir == "r"){
-                val rectBend = RectF((snTail[snTail.lastIndex].posX-10).toFloat(), (snTail[snTail.lastIndex].posY-20).toFloat(), (snTail[snTail.lastIndex].posX+40).toFloat(),(snTail[snTail.lastIndex].posY).toFloat())
-                path.arcTo(rectBend, 180f, 45f, false )
+                val rectBend = RectF((snTail[snTail.lastIndex].posX-10).toFloat(), (snTail[snTail.lastIndex].posY-20).toFloat(), (snTail[snTail.lastIndex].posX+40).toFloat(),(snTail[snTail.lastIndex].posY+20).toFloat())
+                path.arcTo(rectBend, 180f, headTurn, false )
             }
             path.lineTo(snTail[snTail.lastIndex].posBelow.x.toFloat(), snTail[snTail.lastIndex].posBelow.y.toFloat())
         }else{
@@ -300,21 +367,21 @@ class Snack(val food:Food) {
             path.lineTo(snTail[snTail.lastIndex].posBelow.x.toFloat(), snTail[snTail.lastIndex].posBelow.y.toFloat())
         }
 
-        if(snTail.size > 1){
-            for(i in snTail.lastIndex-1 downTo 1){
+        if(snTail.size > (if(drawTail)2 else 1)){
+            for(i in snTail.lastIndex-1 downTo (if(drawTail)2 else 1)){
                 //val rectBend = RectF((snTail[i].posX-10).toFloat(), (snTail[i].posY-20).toFloat(), (snTail[i].posX+10).toFloat(),(snTail[i].posY).toFloat())
                 if(snTail[i].dir != snTail[i+1].dir){
                     if(snTail[i].dir == "u" && snTail[i+1].dir == "l"){
-                        val rectBend = RectF((snTail[i].posX-10).toFloat(), (snTail[i].posY-20).toFloat(), (snTail[i].posX+10).toFloat(),(snTail[i].posY).toFloat())
+                        val rectBend = RectF((snTail[i].posX-40).toFloat(), (snTail[i].posY-20).toFloat(), (snTail[i].posX+10).toFloat(),(snTail[i].posY+20).toFloat())
                         path.arcTo(rectBend, 270f, 90f, false )
                     }else if(snTail[i].dir == "d" && snTail[i+1].dir == "r"){
-                        val rectBend = RectF((snTail[i].posX-10).toFloat(), (snTail[i].posY).toFloat(), (snTail[i].posX+10).toFloat(),(snTail[i].posY+20).toFloat())
+                        val rectBend = RectF((snTail[i].posX-10).toFloat(), (snTail[i].posY-20).toFloat(), (snTail[i].posX+40).toFloat(),(snTail[i].posY+20).toFloat())
                         path.arcTo(rectBend, 90f, 90f, false )
                     }else if(snTail[i].dir == "l" && snTail[i+1].dir == "d"){
-                        val rectBend = RectF((snTail[i].posX-20).toFloat(), (snTail[i].posY-10).toFloat(), (snTail[i].posX).toFloat(),(snTail[i].posY+10).toFloat())
+                        val rectBend = RectF((snTail[i].posX-20).toFloat(), (snTail[i].posY-10).toFloat(), (snTail[i].posX+20).toFloat(),(snTail[i].posY+40).toFloat())
                         path.arcTo(rectBend, 180f, 90f, false )
                     }else if(snTail[i].dir == "r" && snTail[i+1].dir == "u"){
-                        val rectBend = RectF((snTail[i].posX).toFloat(), (snTail[i].posY-10).toFloat(), (snTail[i].posX+20).toFloat(),(snTail[i].posY+10).toFloat())
+                        val rectBend = RectF((snTail[i].posX-20).toFloat(), (snTail[i].posY-40).toFloat(), (snTail[i].posX+20).toFloat(),(snTail[i].posY+10).toFloat())
                         path.arcTo(rectBend, 0f, 90f, false )
                     }else{
                         path.lineTo(snTail[i].posBelow.x.toFloat(), snTail[i].posBelow.y.toFloat())
@@ -324,41 +391,56 @@ class Snack(val food:Food) {
                 }
             }
         }
-        path.lineTo(snTail[0].posBelow.x.toFloat(), snTail[0].posBelow.y.toFloat())
+        path.lineTo(snTail[if(drawTail)1 else 0].posBelow.x.toFloat(), snTail[if(drawTail)1 else 0].posBelow.y.toFloat())
+        if(drawTail){
+             if(snTail[0].dir == "r" && snTail[1].dir == "u"){//i
+                val rectBend = RectF((snTail[1].posX-30).toFloat(), (snTail[1].posY-30).toFloat(), (snTail[1].posX+10).toFloat(),(snTail[1].posY+20).toFloat())
+                path.arcTo(rectBend, 0f, 90f-tailTurn, false )
+            }else if(snTail[0].dir == "l" && snTail[1].dir == "d"){//i
+                val rectBend = RectF((snTail[1].posX-10).toFloat(), (snTail[1].posY-20).toFloat(), (snTail[1].posX+30).toFloat(),(snTail[1].posY+30).toFloat())
+                path.arcTo(rectBend, 180f, 90f-tailTurn, false )
+            }else if(snTail[0].dir == "u" && snTail[1].dir == "l"){//i
+                val rectBend = RectF((snTail[1].posX-30).toFloat(), (snTail[1].posY-10).toFloat(), (snTail[1].posX+20).toFloat(),(snTail[1].posY+30).toFloat())
+                path.arcTo(rectBend, 270f, 90f-tailTurn, false )
+            }else if(snTail[0].dir == "d" && snTail[1].dir == "r"){
+                 val rectBend = RectF((snTail[1].posX-20).toFloat(), (snTail[1].posY-30).toFloat(), (snTail[1].posX+30).toFloat(),(snTail[1].posY+10).toFloat())
+                 path.arcTo(rectBend, 90f, 90f-tailTurn, false )
+            }
+        }
         path.close()
         canvas.drawPath(path, paint)
             //val rec = RectF((350-snHead.width).toFloat(), (350-snHead.width).toFloat(), (350+snHead.width).toFloat(), (350+snHead.width).toFloat())
             //canvas.drawArc(rec, 0f+45f, 180f, false, paint)
         if(drawHead){
-            drawHead = false
+            //drawHead = false
             //paint.color= Color.GREEN
             //val rectHead = RectF((snHead.posX-snHead.width).toFloat(), (snHead.posY-snHead.width).toFloat(), (snHead.posX+snHead.width).toFloat(), (snHead.posY+snHead.width).toFloat())
             //canvas.drawArc(rectHead, snHead.headArc(), 180f, false, paint)
             val rectHead = RectF((snHead.posX-snHead.width).toFloat(), (snHead.posY-snHead.width).toFloat(), (snHead.posX+snHead.width).toFloat(), (snHead.posY+snHead.width).toFloat())
             if(snTail[snTail.lastIndex].dir == "r" && dir == "d"){
-                canvas.drawArc(rectHead, 270f+45f, 180f, false, paint)
+                canvas.drawArc(rectHead, 270f+headTurn, 180f, false, paint)
             }else if(snTail[snTail.lastIndex].dir == "l" && dir == "u"){
-                canvas.drawArc(rectHead, 90f+45f, 180f, false, paint)
+                canvas.drawArc(rectHead, 90f+headTurn, 180f, false, paint)
             }else if(snTail[snTail.lastIndex].dir == "r" && dir == "u"){
-                canvas.drawArc(rectHead, 180f+45f, 180f, false, paint)
+                canvas.drawArc(rectHead, 270f-headTurn, 180f, false, paint)
             }else if(snTail[snTail.lastIndex].dir == "l" && dir == "d"){
-                canvas.drawArc(rectHead, 0f+45f, 180f, false, paint)
+                canvas.drawArc(rectHead, 90f-headTurn, 180f, false, paint)
             }else if(snTail[snTail.lastIndex].dir == "u" && dir == "l"){
-                canvas.drawArc(rectHead, 90f+45f, 180f, false, paint)
+                canvas.drawArc(rectHead, 180f-headTurn, 180f, false, paint)
             }else if(snTail[snTail.lastIndex].dir == "d" && dir == "r"){
-                canvas.drawArc(rectHead, 270f+45f, 180f, false, paint)
+                canvas.drawArc(rectHead, 360f-headTurn, 180f, false, paint)
             }else if(snTail[snTail.lastIndex].dir == "d" && dir == "l"){
-                canvas.drawArc(rectHead, 0f+45f, 180f, false, paint)
+                canvas.drawArc(rectHead, 0f+headTurn, 180f, false, paint)
             }else if(snTail[snTail.lastIndex].dir == "u" && dir == "r"){
-                canvas.drawArc(rectHead, 180f+45f, 180f, false, paint)
+                canvas.drawArc(rectHead, 180f+headTurn, 180f, false, paint)
             }
         }else{
             val rectHead = RectF((snHead.posX-snHead.width).toFloat(), (snHead.posY-snHead.width).toFloat(), (snHead.posX+snHead.width).toFloat(), (snHead.posY+snHead.width).toFloat())
             canvas.drawArc(rectHead, snHead.headArc(), 180f, false, paint)
         }
 
-        val rectTail = RectF((snTail[0].posX-snHead.width).toFloat(), (snTail[0].posY-snHead.width).toFloat(), (snTail[0].posX+snHead.width).toFloat(), (snTail[0].posY+snHead.width).toFloat())
-        canvas.drawArc(rectTail, snTail[0].tailArc(), 180f, false, paint)
+        //val rectTail = RectF((snTail[0].posX-snHead.width).toFloat(), (snTail[0].posY-snHead.width).toFloat(), (snTail[0].posX+snHead.width).toFloat(), (snTail[0].posY+snHead.width).toFloat())
+        //canvas.drawArc(rectTail, snTail[0].tailArc(), 180f, false, paint)
 
         //eyes.drawEyes(canvas, paint, snHead.dir)
 
